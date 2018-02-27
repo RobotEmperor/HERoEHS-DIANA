@@ -293,8 +293,8 @@ void DIANAOnlineWalking::setCurrentIMUSensorOutput(double gyro_x, double gyro_y,
   current_imu_roll_rad_  = atan2( mat_current_imu_.coeff(2,1), mat_current_imu_.coeff(2,2));
   current_imu_pitch_rad_ = atan2(-mat_current_imu_.coeff(2,0), sqrt(robotis_framework::powDI(mat_current_imu_.coeff(2,1), 2) + robotis_framework::powDI(mat_current_imu_.coeff(2,2), 2)));
 
-  std::cout << "gx : " << current_gyro_roll_rad_per_sec_ << " gy : " << current_gyro_pitch_rad_per_sec_
-      << " x : " << current_imu_roll_rad_ << " y : " << current_imu_pitch_rad_ << std::endl;
+  //std::cout << "gx : " << current_gyro_roll_rad_per_sec_ << " gy : " << current_gyro_pitch_rad_per_sec_
+      //<< " x : " << current_imu_roll_rad_ << " y : " << current_imu_pitch_rad_ << std::endl;
 
   imu_data_mutex_lock_.unlock();
 }
