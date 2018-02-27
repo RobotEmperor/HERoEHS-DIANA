@@ -7,6 +7,7 @@
 
 #include "robotis_controller/robotis_controller.h"
 #include "diana_online_walking_module/online_walking_module.h"
+#include "diana_base_module/base_module.h"
 
 
 using namespace diana;
@@ -52,6 +53,7 @@ int main(int argc, char **argv)
 
     sleep(1);
     controller->addMotionModule((robotis_framework::MotionModule*)OnlineWalkingModule::getInstance());
+    controller->addMotionModule((robotis_framework::MotionModule*)BaseModule::getInstance());
 
     controller->startTimer();
 

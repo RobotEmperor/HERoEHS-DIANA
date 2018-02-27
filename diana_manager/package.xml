@@ -23,6 +23,7 @@
   <build_depend>heroehs_pd_balance_controller</build_depend>
   <build_depend>diana_kinematics_dynamics</build_depend>
   <build_depend>diana_online_walking_module</build_depend>
+  <build_depend>diana_base_module</build_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>robotis_controller</run_depend>
   <run_depend>diana_online_walking_module</run_depend>
