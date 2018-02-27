@@ -49,7 +49,7 @@ void DIANAOnlineWalking::initialize(double control_cycle_sec)
   pelvis.roll = 0.0; pelvis.pitch = 0.0; pelvis.yaw = 0;
 
   walking_pattern_.setInitialPose(r_foot, l_foot, pelvis);
-  walking_pattern_.initialize(0.7, 1.6, control_cycle_sec);
+  walking_pattern_.initialize(0.5, 1.6, control_cycle_sec);
 
   // initialize balance
   balance_ctrl_.initialize(control_cycle_sec);
