@@ -105,3 +105,20 @@ bool DIANAOnlineWalking::isRunning()
   return walking_pattern_.isRunning();
 }
 
+
+void DIANAOnlineWalking::setCurrentIMUSensorOutput(double gyro_x, double gyro_y, double quat_x, double quat_y, double quat_z, double quat_w)
+{
+  imu_data_mutex_lock_.lock();
+
+  current_gyro_roll_rad_per_sec_  = gyro_x;
+  current_gyro_pitch_rad_per_sec_ = gyro_y;
+
+  quat_current_imu_ = Eigen::Quaterniond(quat_w, quat_x, quat_y, quat_z);
+
+//  mat_current_imu_ = (rot_x_pi_3d_ * quat_current_imu_.toRotationMatrix()) * rot_z_pi_3d_;
+//
+//  current_imu_roll_rad_  = atan2( mat_current_imu_.coeff(2,1), mat_current_imu_.coeff(2,2));
+//  current_imu_pitch_rad_ = atan2(-mat_current_imu_.coeff(2,0), sqrt(robotis_framework::powDI(mat_current_imu_.coeff(2,1), 2) + robotis_framework::powDI(mat_current_imu_.coeff(2,2), 2)));
+
+  imu_data_mutex_lock_.unlock();
+}

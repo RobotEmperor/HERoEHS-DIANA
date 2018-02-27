@@ -56,7 +56,7 @@ private:
   void publishWalkingTuningData();
 
   /* ROS Topic Callback Functions */
-  //void imuDataOutputCallback(const sensor_msgs::Imu::ConstPtr &msg);
+  void imuDataOutputCallback(const sensor_msgs::Imu::ConstPtr &msg);
 
   /* ROS Service Callback Functions */
   bool setBalanceParamServiceCallback(diana_online_walking_module_msgs::SetBalanceParam::Request  &req,

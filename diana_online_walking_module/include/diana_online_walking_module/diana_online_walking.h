@@ -52,7 +52,17 @@ public:
   int balance_error_;
   heroehs::BalanceControlUsingPDController balance_ctrl_;
 
-//  // sensor value
+
+  void setCurrentIMUSensorOutput(double gyro_x, double gyro_y, double quat_x, double quat_y, double quat_z, double quat_w);
+
+  // sensor value
+  //imu
+  Eigen::Quaterniond quat_current_imu_;
+  Eigen::Matrix3d mat_current_imu_;
+  Eigen::Matrix3d mat_imu_frame_ref_;
+  double current_imu_roll_rad_, current_imu_pitch_rad_;
+  double current_gyro_roll_rad_per_sec_, current_gyro_pitch_rad_per_sec_;
+
 //  double current_right_fx_N_,  current_right_fy_N_,  current_right_fz_N_;
 //  double current_right_tx_Nm_, current_right_ty_Nm_, current_right_tz_Nm_;
 //  double current_left_fx_N_,  current_left_fy_N_,  current_left_fz_N_;
@@ -61,6 +71,7 @@ private:
   heroehs::OnlineWalkingPatternGenerator walking_pattern_;
   DIANAKinematicsDynamics* diana_kd_;
 
+  boost::mutex imu_data_mutex_lock_;
 };
 
 }

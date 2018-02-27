@@ -176,7 +176,7 @@ void OnlineWalkingModule::queueThread()
   ros::ServiceServer remove_existing_step_data = ros_node.advertiseService("/heroehs/online_walking/remove_existing_step_data", &OnlineWalkingModule::removeExistingStepDataServiceCallback, this);
 
   /* sensor topic subscribe */
-  //ros::Subscriber imu_data_sub      = ros_node.subscribe("/robotis/sensor/imu/imu",              3, &OnlineWalkingModule::imuDataOutputCallback,        this);
+  ros::Subscriber imu_data_sub      = ros_node.subscribe("/imu/data", 3, &OnlineWalkingModule::imuDataOutputCallback,        this);
 
   ros::WallDuration duration(control_cycle_msec_ / 1000.0);
   if(ros::param::get("gazebo", gazebo_) == false)
@@ -777,6 +777,16 @@ bool OnlineWalkingModule::checkBalanceOnOff()
     return true;
 }
 
+void OnlineWalkingModule::imuDataOutputCallback(const sensor_msgs::Imu::ConstPtr &msg)
+{
+  DIANAOnlineWalking *online_walking = DIANAOnlineWalking::getInstance();
+
+  online_walking->setCurrentIMUSensorOutput((msg->angular_velocity.y), (msg->angular_velocity.x),
+                                            msg->orientation.x, msg->orientation.y, msg->orientation.z,
+                                            msg->orientation.w);
+}
+
+
 void OnlineWalkingModule::onModuleEnable()
 {
   std::string status_msg = WalkingStatusMSG::WALKING_MODULE_IS_ENABLED_MSG;
@@ -887,23 +897,23 @@ void OnlineWalkingModule::process(std::map<std::string, robotis_framework::Dynam
 //  l_foot_Tz_Nm_ = robotis_framework::sign(l_foot_Tz_Nm_) *fmin(fabs(l_foot_Tz_Nm_), 300.0);
 
 
-//  if(balance_update_with_loop_ == true)
-//  {
-//    balance_update_sys_time_ += control_cycle_msec_ * 0.001;
-//    if(balance_update_sys_time_ >= balance_update_duration_ )
-//    {
-//      balance_update_sys_time_ = balance_update_duration_;
-//      balance_update_with_loop_ = false;
-//      setBalanceParam(desired_balance_param_);
-//      std::string status_msg = WalkingStatusMSG::BALANCE_PARAM_SETTING_FINISHED_MSG;
-//      publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_INFO, status_msg);
-//      publishDoneMsg("walking_balance");
-//    }
-//    else
-//    {
-//      updateBalanceParam();
-//    }
-//  }
+  if(balance_update_with_loop_ == true)
+  {
+    balance_update_sys_time_ += control_cycle_msec_ * 0.001;
+    if(balance_update_sys_time_ >= balance_update_duration_ )
+    {
+      balance_update_sys_time_ = balance_update_duration_;
+      balance_update_with_loop_ = false;
+      setBalanceParam(desired_balance_param_);
+      std::string status_msg = WalkingStatusMSG::BALANCE_PARAM_SETTING_FINISHED_MSG;
+      publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_INFO, status_msg);
+      publishDoneMsg("walking_balance");
+    }
+    else
+    {
+      updateBalanceParam();
+    }
+  }
 
 //  if(joint_feedback_update_with_loop_ == true)
 //  {
