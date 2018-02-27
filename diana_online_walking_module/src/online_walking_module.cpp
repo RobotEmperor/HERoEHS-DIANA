@@ -128,28 +128,26 @@ void OnlineWalkingModule::initialize(const int control_cycle_msec, robotis_frame
 
   previous_running_ = isRunning();
 
-//  online_walking->hip_roll_feedforward_angle_rad_ = 0.0;
-//
-//  online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.p_gain_ = 0;
-//  online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.d_gain_ = 0;
-//  online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.p_gain_ = 0;
-//  online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.d_gain_ = 0;
-//
-//  online_walking->balance_ctrl_.foot_roll_angle_ctrl_.p_gain_ = 0;
-//  online_walking->balance_ctrl_.foot_roll_angle_ctrl_.d_gain_ = 0;
-//  online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.p_gain_ = 0;
-//  online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.d_gain_ = 0;
-//
-//  online_walking->balance_ctrl_.right_foot_force_x_ctrl_.p_gain_ = 0;
-//  online_walking->balance_ctrl_.right_foot_force_x_ctrl_.d_gain_ = 0;
-//  online_walking->balance_ctrl_.right_foot_force_y_ctrl_.p_gain_ = 0;
-//  online_walking->balance_ctrl_.right_foot_force_y_ctrl_.d_gain_ = 0;
-//  online_walking->balance_ctrl_.right_foot_force_z_ctrl_.p_gain_ = 0;
-//  online_walking->balance_ctrl_.right_foot_force_z_ctrl_.d_gain_ = 0;
-//  online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.p_gain_ = 0;
-//  online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.d_gain_ = 0;
-//  online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.p_gain_ = 0;
-//  online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.d_gain_ = 0;
+  online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.p_gain_ = 0;
+  online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.d_gain_ = 0;
+  online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.p_gain_ = 0;
+  online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.d_gain_ = 0;
+
+  online_walking->balance_ctrl_.foot_roll_angle_ctrl_.p_gain_ = 0;
+  online_walking->balance_ctrl_.foot_roll_angle_ctrl_.d_gain_ = 0;
+  online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.p_gain_ = 0;
+  online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.d_gain_ = 0;
+
+  online_walking->balance_ctrl_.right_foot_force_x_ctrl_.p_gain_ = 0;
+  online_walking->balance_ctrl_.right_foot_force_x_ctrl_.d_gain_ = 0;
+  online_walking->balance_ctrl_.right_foot_force_y_ctrl_.p_gain_ = 0;
+  online_walking->balance_ctrl_.right_foot_force_y_ctrl_.d_gain_ = 0;
+  online_walking->balance_ctrl_.right_foot_force_z_ctrl_.p_gain_ = 0;
+  online_walking->balance_ctrl_.right_foot_force_z_ctrl_.d_gain_ = 0;
+  online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.p_gain_ = 0;
+  online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.d_gain_ = 0;
+  online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.p_gain_ = 0;
+  online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.d_gain_ = 0;
 }
 
 
@@ -173,7 +171,7 @@ void OnlineWalkingModule::queueThread()
   ros::ServiceServer add_step_data_array_sever = ros_node.advertiseService("/heroehs/online_walking/add_step_data",             &OnlineWalkingModule::addStepDataServiceCallback,            this);
   ros::ServiceServer walking_start_server      = ros_node.advertiseService("/heroehs/online_walking/walking_start",             &OnlineWalkingModule::startWalkingServiceCallback,           this);
   ros::ServiceServer is_running_server         = ros_node.advertiseService("/heroehs/online_walking/is_running",                &OnlineWalkingModule::IsRunningServiceCallback,              this);
-  //ros::ServiceServer set_balance_param_server  = ros_node.advertiseService("/heroehs/online_walking/set_balance_param",         &OnlineWalkingModule::setBalanceParamServiceCallback,        this);
+  ros::ServiceServer set_balance_param_server  = ros_node.advertiseService("/heroehs/online_walking/set_balance_param",         &OnlineWalkingModule::setBalanceParamServiceCallback,        this);
   //ros::ServiceServer set_joint_feedback_gain   = ros_node.advertiseService("/heroehs/online_walking/joint_feedback_gain",       &OnlineWalkingModule::setJointFeedBackGainServiceCallback,   this);
   ros::ServiceServer remove_existing_step_data = ros_node.advertiseService("/heroehs/online_walking/remove_existing_step_data", &OnlineWalkingModule::removeExistingStepDataServiceCallback, this);
 
@@ -187,11 +185,6 @@ void OnlineWalkingModule::queueThread()
   while(ros_node.ok())
     callback_queue.callAvailable(duration);
 
-//  while (ros_node.ok())
-//  {
-//    callback_queue.callAvailable();
-//    usleep(1000);
-//  }
 }
 
 void OnlineWalkingModule::publishStatusMsg(unsigned int type, std::string msg)
@@ -435,12 +428,12 @@ bool OnlineWalkingModule::addStepDataServiceCallback(diana_online_walking_module
     }
   }
 
-//  if(checkBalanceOnOff() == false)
-//  {
-//    std::string status_msg  = WalkingStatusMSG::BALANCE_HAS_BEEN_TURNED_OFF;
-//    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-//    return true;
-//  }
+  if(checkBalanceOnOff() == false)
+  {
+    std::string status_msg  = WalkingStatusMSG::BALANCE_HAS_BEEN_TURNED_OFF;
+    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
+    return true;
+  }
 
   for(unsigned int i = 0; i < req_step_data_array.size() ; i++)
     online_walking->addStepData(req_step_data_array[i]);
@@ -471,12 +464,12 @@ bool OnlineWalkingModule::startWalkingServiceCallback(diana_online_walking_modul
     return true;
   }
 
-//  if(checkBalanceOnOff() == false)
-//  {
-//    std::string status_msg  = WalkingStatusMSG::BALANCE_HAS_BEEN_TURNED_OFF;
-//    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-//    return true;
-//  }
+  if(checkBalanceOnOff() == false)
+  {
+    std::string status_msg  = WalkingStatusMSG::BALANCE_HAS_BEEN_TURNED_OFF;
+    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
+    return true;
+  }
 
   if(prev_walking->getNumofRemainingUnreservedStepData() == 0)
   {
@@ -525,6 +518,263 @@ bool OnlineWalkingModule::removeExistingStepDataServiceCallback(diana_online_wal
         online_walking->eraseLastStepData();
   }
   return true;
+}
+
+bool OnlineWalkingModule::setBalanceParamServiceCallback(diana_online_walking_module_msgs::SetBalanceParam::Request  &req,
+    diana_online_walking_module_msgs::SetBalanceParam::Response &res)
+{
+  DIANAOnlineWalking *online_walking = DIANAOnlineWalking::getInstance();
+  res.result = diana_online_walking_module_msgs::SetBalanceParam::Response::NO_ERROR;
+
+  if( enable_ == false)
+    res.result |= diana_online_walking_module_msgs::SetBalanceParam::Response::NOT_ENABLED_WALKING_MODULE;
+
+  if( balance_update_with_loop_ == true)
+  {
+    res.result |= diana_online_walking_module_msgs::SetBalanceParam::Response::PREV_REQUEST_IS_NOT_FINISHED;
+  }
+
+  if( (req.balance_param.roll_gyro_cut_off_frequency         <= 0) ||
+      (req.balance_param.pitch_gyro_cut_off_frequency        <= 0) ||
+      (req.balance_param.roll_angle_cut_off_frequency        <= 0) ||
+      (req.balance_param.pitch_angle_cut_off_frequency       <= 0) ||
+      (req.balance_param.foot_x_force_cut_off_frequency      <= 0) ||
+      (req.balance_param.foot_y_force_cut_off_frequency      <= 0) ||
+      (req.balance_param.foot_z_force_cut_off_frequency      <= 0) ||
+      (req.balance_param.foot_roll_torque_cut_off_frequency  <= 0) ||
+      (req.balance_param.foot_pitch_torque_cut_off_frequency <= 0) )
+  {
+    //res.result |= thormang3_walking_module_msgs::SetBalanceParam::Response::CUT_OFF_FREQUENCY_IS_ZERO_OR_NEGATIVE;
+    previous_balance_param_.roll_gyro_cut_off_frequency         = req.balance_param.roll_gyro_cut_off_frequency;
+    previous_balance_param_.pitch_gyro_cut_off_frequency        = req.balance_param.pitch_gyro_cut_off_frequency;
+    previous_balance_param_.roll_angle_cut_off_frequency        = req.balance_param.roll_angle_cut_off_frequency;
+    previous_balance_param_.pitch_angle_cut_off_frequency       = req.balance_param.pitch_angle_cut_off_frequency;
+    previous_balance_param_.foot_x_force_cut_off_frequency      = req.balance_param.foot_x_force_cut_off_frequency;
+    previous_balance_param_.foot_y_force_cut_off_frequency      = req.balance_param.foot_y_force_cut_off_frequency;
+    previous_balance_param_.foot_z_force_cut_off_frequency      = req.balance_param.foot_z_force_cut_off_frequency;
+    previous_balance_param_.foot_roll_torque_cut_off_frequency  = req.balance_param.foot_roll_torque_cut_off_frequency;
+    previous_balance_param_.foot_pitch_torque_cut_off_frequency = req.balance_param.foot_pitch_torque_cut_off_frequency;
+  }
+
+  if(res.result != diana_online_walking_module_msgs::SetBalanceParam::Response::NO_ERROR)
+  {
+    publishDoneMsg("walking_balance_failed");
+    return true;
+  }
+
+  if( req.updating_duration <= 0.0 )
+  {
+    // under 8ms apply immediately
+    setBalanceParam(req.balance_param);
+    std::string status_msg = WalkingStatusMSG::BALANCE_PARAM_SETTING_FINISHED_MSG;
+    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_INFO, status_msg);
+    publishDoneMsg("walking_balance");
+    return true;
+  }
+  else
+  {
+    balance_update_duration_ = req.updating_duration;
+  }
+
+  balance_update_sys_time_ = 0.0;
+  balance_update_tra_.changeTrajectory(0, 0, 0, 0, balance_update_duration_, 1.0, 0, 0);
+
+
+  desired_balance_param_ = req.balance_param;
+
+  previous_balance_param_.cob_x_offset_m                  = online_walking->balance_ctrl_.getCOBManualAdjustmentX();
+  previous_balance_param_.cob_y_offset_m                  = online_walking->balance_ctrl_.getCOBManualAdjustmentY();
+
+  ////gain
+  //gyro
+  previous_balance_param_.foot_roll_gyro_p_gain           = online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.p_gain_;
+  previous_balance_param_.foot_roll_gyro_d_gain           = online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.d_gain_;
+  previous_balance_param_.foot_pitch_gyro_p_gain          = online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.p_gain_;
+  previous_balance_param_.foot_pitch_gyro_d_gain          = online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.d_gain_;
+
+  //orientation
+  previous_balance_param_.foot_roll_angle_p_gain          = online_walking->balance_ctrl_.foot_roll_angle_ctrl_.p_gain_;
+  previous_balance_param_.foot_roll_angle_d_gain          = online_walking->balance_ctrl_.foot_roll_angle_ctrl_.d_gain_;
+  previous_balance_param_.foot_pitch_angle_p_gain         = online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.p_gain_;
+  previous_balance_param_.foot_pitch_angle_d_gain         = online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.d_gain_;
+
+  //force torque
+  previous_balance_param_.foot_x_force_p_gain               = online_walking->balance_ctrl_.right_foot_force_x_ctrl_.p_gain_;
+  previous_balance_param_.foot_y_force_p_gain               = online_walking->balance_ctrl_.right_foot_force_y_ctrl_.p_gain_;
+  previous_balance_param_.foot_z_force_p_gain               = online_walking->balance_ctrl_.right_foot_force_z_ctrl_.p_gain_;
+  previous_balance_param_.foot_roll_torque_p_gain           = online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.p_gain_;
+  previous_balance_param_.foot_pitch_torque_p_gain          = online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.p_gain_;
+
+  previous_balance_param_.foot_x_force_d_gain               = online_walking->balance_ctrl_.right_foot_force_x_ctrl_.d_gain_;
+  previous_balance_param_.foot_y_force_d_gain               = online_walking->balance_ctrl_.right_foot_force_y_ctrl_.d_gain_;
+  previous_balance_param_.foot_z_force_d_gain               = online_walking->balance_ctrl_.right_foot_force_z_ctrl_.d_gain_;
+  previous_balance_param_.foot_roll_torque_d_gain           = online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.d_gain_;
+  previous_balance_param_.foot_pitch_torque_d_gain          = online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.d_gain_;
+
+  ////cut off freq
+  //gyro
+  previous_balance_param_.roll_gyro_cut_off_frequency  = online_walking->balance_ctrl_.roll_gyro_lpf_.getCutOffFrequency();
+  previous_balance_param_.pitch_gyro_cut_off_frequency = online_walking->balance_ctrl_.pitch_gyro_lpf_.getCutOffFrequency();
+
+  //orientation
+  previous_balance_param_.roll_angle_cut_off_frequency  = online_walking->balance_ctrl_.roll_angle_lpf_.getCutOffFrequency();
+  previous_balance_param_.pitch_angle_cut_off_frequency = online_walking->balance_ctrl_.pitch_angle_lpf_.getCutOffFrequency();
+
+  //force torque
+  previous_balance_param_.foot_x_force_cut_off_frequency     = online_walking->balance_ctrl_.right_foot_force_x_lpf_.getCutOffFrequency();
+  previous_balance_param_.foot_y_force_cut_off_frequency     = online_walking->balance_ctrl_.right_foot_force_y_lpf_.getCutOffFrequency();
+  previous_balance_param_.foot_z_force_cut_off_frequency     = online_walking->balance_ctrl_.right_foot_force_z_lpf_.getCutOffFrequency();
+  previous_balance_param_.foot_roll_torque_cut_off_frequency  = online_walking->balance_ctrl_.right_foot_torque_roll_lpf_.getCutOffFrequency();
+  previous_balance_param_.foot_pitch_torque_cut_off_frequency = online_walking->balance_ctrl_.right_foot_torque_pitch_lpf_.getCutOffFrequency();
+
+  balance_update_with_loop_ = true;
+
+  std::string status_msg = WalkingStatusMSG::BALANCE_PARAM_SETTING_STARTED_MSG;
+  publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_INFO, status_msg);
+
+  return true;
+}
+
+void OnlineWalkingModule::setBalanceParam(diana_online_walking_module_msgs::BalanceParam& balance_param_msg)
+{
+  DIANAOnlineWalking *online_walking = DIANAOnlineWalking::getInstance();
+
+  online_walking->balance_ctrl_.setCOBManualAdjustment(balance_param_msg.cob_x_offset_m, balance_param_msg.cob_y_offset_m, 0);
+
+  //// set gain
+  //gyro
+  online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.p_gain_ = balance_param_msg.foot_roll_gyro_p_gain;
+  online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.d_gain_ = balance_param_msg.foot_roll_gyro_d_gain;
+  online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.p_gain_ = balance_param_msg.foot_pitch_gyro_p_gain;
+  online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.d_gain_ = balance_param_msg.foot_pitch_gyro_d_gain;
+
+  //orientation
+  online_walking->balance_ctrl_.foot_roll_angle_ctrl_.p_gain_  = balance_param_msg.foot_roll_angle_p_gain;
+  online_walking->balance_ctrl_.foot_roll_angle_ctrl_.d_gain_  = balance_param_msg.foot_roll_angle_d_gain;
+  online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.p_gain_ = balance_param_msg.foot_pitch_angle_p_gain;
+  online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.d_gain_ = balance_param_msg.foot_pitch_angle_d_gain;
+
+  //force torque
+  online_walking->balance_ctrl_.right_foot_force_x_ctrl_.p_gain_      = balance_param_msg.foot_x_force_p_gain;
+  online_walking->balance_ctrl_.right_foot_force_y_ctrl_.p_gain_      = balance_param_msg.foot_y_force_p_gain;
+  online_walking->balance_ctrl_.right_foot_force_z_ctrl_.p_gain_      = balance_param_msg.foot_z_force_p_gain;
+  online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.p_gain_  = balance_param_msg.foot_roll_torque_p_gain;
+  online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.p_gain_ = balance_param_msg.foot_roll_torque_p_gain;
+  online_walking->balance_ctrl_.right_foot_force_x_ctrl_.d_gain_      = balance_param_msg.foot_x_force_d_gain;
+  online_walking->balance_ctrl_.right_foot_force_y_ctrl_.d_gain_      = balance_param_msg.foot_y_force_d_gain;
+  online_walking->balance_ctrl_.right_foot_force_z_ctrl_.d_gain_      = balance_param_msg.foot_z_force_d_gain;
+  online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.d_gain_  = balance_param_msg.foot_roll_torque_d_gain;
+  online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.d_gain_ = balance_param_msg.foot_roll_torque_d_gain;
+
+  online_walking->balance_ctrl_.left_foot_force_x_ctrl_.p_gain_      = balance_param_msg.foot_x_force_p_gain;
+  online_walking->balance_ctrl_.left_foot_force_y_ctrl_.p_gain_      = balance_param_msg.foot_y_force_p_gain;
+  online_walking->balance_ctrl_.left_foot_force_z_ctrl_.p_gain_      = balance_param_msg.foot_z_force_p_gain;
+  online_walking->balance_ctrl_.left_foot_torque_roll_ctrl_.p_gain_  = balance_param_msg.foot_roll_torque_p_gain;
+  online_walking->balance_ctrl_.left_foot_torque_pitch_ctrl_.p_gain_ = balance_param_msg.foot_roll_torque_p_gain;
+  online_walking->balance_ctrl_.left_foot_force_x_ctrl_.d_gain_      = balance_param_msg.foot_x_force_d_gain;
+  online_walking->balance_ctrl_.left_foot_force_y_ctrl_.d_gain_      = balance_param_msg.foot_y_force_d_gain;
+  online_walking->balance_ctrl_.left_foot_force_z_ctrl_.d_gain_      = balance_param_msg.foot_z_force_d_gain;
+  online_walking->balance_ctrl_.left_foot_torque_roll_ctrl_.d_gain_  = balance_param_msg.foot_roll_torque_d_gain;
+  online_walking->balance_ctrl_.left_foot_torque_pitch_ctrl_.d_gain_ = balance_param_msg.foot_roll_torque_d_gain;
+
+  //// set cut off freq
+  online_walking->balance_ctrl_.roll_gyro_lpf_.setCutOffFrequency(balance_param_msg.roll_gyro_cut_off_frequency);
+  online_walking->balance_ctrl_.pitch_gyro_lpf_.setCutOffFrequency(balance_param_msg.pitch_gyro_cut_off_frequency);
+  online_walking->balance_ctrl_.roll_angle_lpf_.setCutOffFrequency(balance_param_msg.roll_angle_cut_off_frequency);
+  online_walking->balance_ctrl_.pitch_angle_lpf_.setCutOffFrequency(balance_param_msg.pitch_angle_cut_off_frequency);
+
+  online_walking->balance_ctrl_.right_foot_force_x_lpf_.setCutOffFrequency(balance_param_msg.foot_x_force_cut_off_frequency);
+  online_walking->balance_ctrl_.right_foot_force_y_lpf_.setCutOffFrequency(balance_param_msg.foot_y_force_cut_off_frequency);
+  online_walking->balance_ctrl_.right_foot_force_z_lpf_.setCutOffFrequency(balance_param_msg.foot_z_force_cut_off_frequency);
+  online_walking->balance_ctrl_.right_foot_torque_roll_lpf_.setCutOffFrequency(balance_param_msg.foot_roll_torque_cut_off_frequency);
+  online_walking->balance_ctrl_.right_foot_torque_pitch_lpf_.setCutOffFrequency(balance_param_msg.foot_pitch_torque_cut_off_frequency);
+
+  online_walking->balance_ctrl_.left_foot_force_x_lpf_.setCutOffFrequency(balance_param_msg.foot_x_force_cut_off_frequency);
+  online_walking->balance_ctrl_.left_foot_force_y_lpf_.setCutOffFrequency(balance_param_msg.foot_y_force_cut_off_frequency);
+  online_walking->balance_ctrl_.left_foot_force_z_lpf_.setCutOffFrequency(balance_param_msg.foot_z_force_cut_off_frequency);
+  online_walking->balance_ctrl_.left_foot_torque_roll_lpf_.setCutOffFrequency(balance_param_msg.foot_roll_torque_cut_off_frequency);
+  online_walking->balance_ctrl_.left_foot_torque_pitch_lpf_.setCutOffFrequency(balance_param_msg.foot_pitch_torque_cut_off_frequency);
+}
+
+void OnlineWalkingModule::updateBalanceParam()
+{
+  double current_update_gain = balance_update_tra_.getPosition(balance_update_sys_time_);
+
+  current_balance_param_.cob_x_offset_m                  = current_update_gain*(desired_balance_param_.cob_x_offset_m                   - previous_balance_param_.cob_x_offset_m                ) + previous_balance_param_.cob_x_offset_m;
+  current_balance_param_.cob_y_offset_m                  = current_update_gain*(desired_balance_param_.cob_y_offset_m                   - previous_balance_param_.cob_y_offset_m                ) + previous_balance_param_.cob_y_offset_m;
+
+  current_balance_param_.foot_roll_gyro_p_gain                = current_update_gain*(desired_balance_param_.foot_roll_gyro_p_gain                - previous_balance_param_.foot_roll_gyro_p_gain              ) + previous_balance_param_.foot_roll_gyro_p_gain;
+  current_balance_param_.foot_roll_gyro_d_gain                = current_update_gain*(desired_balance_param_.foot_roll_gyro_d_gain                - previous_balance_param_.foot_roll_gyro_d_gain              ) + previous_balance_param_.foot_roll_gyro_d_gain;
+  current_balance_param_.foot_pitch_gyro_p_gain               = current_update_gain*(desired_balance_param_.foot_pitch_gyro_p_gain               - previous_balance_param_.foot_pitch_gyro_p_gain             ) + previous_balance_param_.foot_pitch_gyro_p_gain;
+  current_balance_param_.foot_pitch_gyro_d_gain               = current_update_gain*(desired_balance_param_.foot_pitch_gyro_d_gain               - previous_balance_param_.foot_pitch_gyro_d_gain             ) + previous_balance_param_.foot_pitch_gyro_d_gain;
+  current_balance_param_.foot_roll_angle_p_gain               = current_update_gain*(desired_balance_param_.foot_roll_angle_p_gain               - previous_balance_param_.foot_roll_angle_p_gain             ) + previous_balance_param_.foot_roll_angle_p_gain;
+  current_balance_param_.foot_roll_angle_d_gain               = current_update_gain*(desired_balance_param_.foot_roll_angle_d_gain               - previous_balance_param_.foot_roll_angle_d_gain             ) + previous_balance_param_.foot_roll_angle_d_gain;
+  current_balance_param_.foot_pitch_angle_p_gain              = current_update_gain*(desired_balance_param_.foot_pitch_angle_p_gain              - previous_balance_param_.foot_pitch_angle_p_gain            ) + previous_balance_param_.foot_pitch_angle_p_gain;
+  current_balance_param_.foot_pitch_angle_d_gain              = current_update_gain*(desired_balance_param_.foot_pitch_angle_d_gain              - previous_balance_param_.foot_pitch_angle_d_gain            ) + previous_balance_param_.foot_pitch_angle_d_gain;
+  current_balance_param_.foot_x_force_p_gain                  = current_update_gain*(desired_balance_param_.foot_x_force_p_gain                  - previous_balance_param_.foot_x_force_p_gain                ) + previous_balance_param_.foot_x_force_p_gain;
+  current_balance_param_.foot_y_force_p_gain                  = current_update_gain*(desired_balance_param_.foot_y_force_p_gain                  - previous_balance_param_.foot_y_force_p_gain                ) + previous_balance_param_.foot_y_force_p_gain;
+  current_balance_param_.foot_z_force_p_gain                  = current_update_gain*(desired_balance_param_.foot_z_force_p_gain                  - previous_balance_param_.foot_z_force_p_gain                ) + previous_balance_param_.foot_z_force_p_gain;
+  current_balance_param_.foot_roll_torque_p_gain              = current_update_gain*(desired_balance_param_.foot_roll_torque_p_gain              - previous_balance_param_.foot_roll_torque_p_gain            ) + previous_balance_param_.foot_roll_torque_p_gain;
+  current_balance_param_.foot_pitch_torque_p_gain             = current_update_gain*(desired_balance_param_.foot_pitch_torque_p_gain             - previous_balance_param_.foot_pitch_torque_p_gain           ) + previous_balance_param_.foot_pitch_torque_p_gain;
+  current_balance_param_.foot_x_force_d_gain                  = current_update_gain*(desired_balance_param_.foot_x_force_d_gain                  - previous_balance_param_.foot_x_force_d_gain                ) + previous_balance_param_.foot_x_force_d_gain;
+  current_balance_param_.foot_y_force_d_gain                  = current_update_gain*(desired_balance_param_.foot_y_force_d_gain                  - previous_balance_param_.foot_y_force_d_gain                ) + previous_balance_param_.foot_y_force_d_gain;
+  current_balance_param_.foot_z_force_d_gain                  = current_update_gain*(desired_balance_param_.foot_z_force_d_gain                  - previous_balance_param_.foot_z_force_d_gain                ) + previous_balance_param_.foot_z_force_d_gain;
+  current_balance_param_.foot_roll_torque_d_gain              = current_update_gain*(desired_balance_param_.foot_roll_torque_d_gain              - previous_balance_param_.foot_roll_torque_d_gain            ) + previous_balance_param_.foot_roll_torque_d_gain;
+  current_balance_param_.foot_pitch_torque_d_gain             = current_update_gain*(desired_balance_param_.foot_pitch_torque_d_gain             - previous_balance_param_.foot_pitch_torque_d_gain           ) + previous_balance_param_.foot_pitch_torque_d_gain;
+
+  current_balance_param_.roll_gyro_cut_off_frequency          = current_update_gain*(desired_balance_param_.roll_gyro_cut_off_frequency          - previous_balance_param_.roll_gyro_cut_off_frequency        ) + previous_balance_param_.roll_gyro_cut_off_frequency;
+  current_balance_param_.pitch_gyro_cut_off_frequency         = current_update_gain*(desired_balance_param_.pitch_gyro_cut_off_frequency         - previous_balance_param_.pitch_gyro_cut_off_frequency       ) + previous_balance_param_.pitch_gyro_cut_off_frequency;
+  current_balance_param_.roll_angle_cut_off_frequency         = current_update_gain*(desired_balance_param_.roll_angle_cut_off_frequency         - previous_balance_param_.roll_angle_cut_off_frequency       ) + previous_balance_param_.roll_angle_cut_off_frequency;
+  current_balance_param_.pitch_angle_cut_off_frequency        = current_update_gain*(desired_balance_param_.pitch_angle_cut_off_frequency        - previous_balance_param_.pitch_angle_cut_off_frequency      ) + previous_balance_param_.pitch_angle_cut_off_frequency;
+  current_balance_param_.foot_x_force_cut_off_frequency       = current_update_gain*(desired_balance_param_.foot_x_force_cut_off_frequency       - previous_balance_param_.foot_x_force_cut_off_frequency     ) + previous_balance_param_.foot_x_force_cut_off_frequency;
+  current_balance_param_.foot_y_force_cut_off_frequency       = current_update_gain*(desired_balance_param_.foot_y_force_cut_off_frequency       - previous_balance_param_.foot_y_force_cut_off_frequency     ) + previous_balance_param_.foot_y_force_cut_off_frequency;
+  current_balance_param_.foot_z_force_cut_off_frequency       = current_update_gain*(desired_balance_param_.foot_z_force_cut_off_frequency       - previous_balance_param_.foot_z_force_cut_off_frequency     ) + previous_balance_param_.foot_z_force_cut_off_frequency;
+  current_balance_param_.foot_roll_torque_cut_off_frequency   = current_update_gain*(desired_balance_param_.foot_roll_torque_cut_off_frequency   - previous_balance_param_.foot_roll_torque_cut_off_frequency ) + previous_balance_param_.foot_roll_torque_cut_off_frequency;
+  current_balance_param_.foot_pitch_torque_cut_off_frequency  = current_update_gain*(desired_balance_param_.foot_pitch_torque_cut_off_frequency  - previous_balance_param_.foot_pitch_torque_cut_off_frequency) + previous_balance_param_.foot_pitch_torque_cut_off_frequency;
+
+  setBalanceParam(current_balance_param_);
+}
+
+bool OnlineWalkingModule::checkBalanceOnOff()
+{
+  if(gazebo_)
+    return true;
+
+  DIANAOnlineWalking *online_walking = DIANAOnlineWalking::getInstance();
+
+  if ((fabs(online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.p_gain_           ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.foot_roll_gyro_ctrl_.d_gain_           ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.p_gain_          ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.foot_pitch_gyro_ctrl_.d_gain_          ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.foot_roll_angle_ctrl_.p_gain_          ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.foot_roll_angle_ctrl_.d_gain_          ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.p_gain_         ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.foot_pitch_angle_ctrl_.d_gain_         ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_force_x_ctrl_.p_gain_       ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_force_y_ctrl_.p_gain_       ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_force_z_ctrl_.p_gain_       ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.p_gain_   ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.p_gain_  ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_force_x_ctrl_.d_gain_       ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_force_y_ctrl_.d_gain_       ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_force_z_ctrl_.d_gain_       ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_torque_roll_ctrl_.d_gain_   ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.right_foot_torque_pitch_ctrl_.d_gain_  ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_force_x_ctrl_.p_gain_        ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_force_y_ctrl_.p_gain_        ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_force_z_ctrl_.p_gain_        ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_torque_roll_ctrl_.p_gain_    ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_torque_pitch_ctrl_.p_gain_   ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_force_x_ctrl_.d_gain_        ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_force_y_ctrl_.d_gain_        ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_force_z_ctrl_.d_gain_        ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_torque_roll_ctrl_.d_gain_    ) < 1e-7) &&
+      (fabs(online_walking->balance_ctrl_.left_foot_torque_pitch_ctrl_.d_gain_   ) < 1e-7))
+  {
+    return false;
+  }
+  else
+    return true;
 }
 
 void OnlineWalkingModule::onModuleEnable()
@@ -654,7 +904,7 @@ void OnlineWalkingModule::process(std::map<std::string, robotis_framework::Dynam
 //      updateBalanceParam();
 //    }
 //  }
-//
+
 //  if(joint_feedback_update_with_loop_ == true)
 //  {
 //    joint_feedback_update_sys_time_ += control_cycle_msec_ * 0.001;
@@ -686,35 +936,22 @@ void OnlineWalkingModule::process(std::map<std::string, robotis_framework::Dynam
 //  online_walking->current_left_ty_Nm_ = l_foot_Ty_Nm_;
 //  online_walking->current_left_tz_Nm_ = l_foot_Tz_Nm_;
 
-//  online_walking->curr_angle_rad_[0]  = result_["r_leg_hip_y"]->goal_position_;
-//  online_walking->curr_angle_rad_[1]  = result_["r_leg_hip_r"]->goal_position_;
-//  online_walking->curr_angle_rad_[2]  = result_["r_leg_hip_p"]->goal_position_;
-//  online_walking->curr_angle_rad_[3]  = result_["r_leg_kn_p" ]->goal_position_;
-//  online_walking->curr_angle_rad_[4]  = result_["r_leg_an_p" ]->goal_position_;
-//  online_walking->curr_angle_rad_[5]  = result_["r_leg_an_r" ]->goal_position_;
-//
-//  online_walking->curr_angle_rad_[6]  = result_["l_leg_hip_y"]->goal_position_;
-//  online_walking->curr_angle_rad_[7]  = result_["l_leg_hip_r"]->goal_position_;
-//  online_walking->curr_angle_rad_[8]  = result_["l_leg_hip_p"]->goal_position_;
-//  online_walking->curr_angle_rad_[9]  = result_["l_leg_kn_p" ]->goal_position_;
-//  online_walking->curr_angle_rad_[10] = result_["l_leg_an_p" ]->goal_position_;
-//  online_walking->curr_angle_rad_[11] = result_["l_leg_an_r" ]->goal_position_;
-//
-//  for(std::map<std::string, robotis_framework::DynamixelState*>::iterator result_it = result_.begin();
-//      result_it != result_.end();
-//      result_it++)
-//  {
-//    std::map<std::string, robotis_framework::Dynamixel*>::iterator dxls_it = dxls.find(result_it->first);
-//    if(dxls_it != dxls.end())
-//      online_walking->curr_angle_rad_[joint_name_to_index_[result_it->first]] = dxls_it->second->dxl_state_->present_position_;
-//  }
+
+  for(std::map<std::string, robotis_framework::DynamixelState*>::iterator result_it = result_.begin();
+      result_it != result_.end();
+      result_it++)
+  {
+    std::map<std::string, robotis_framework::Dynamixel*>::iterator dxls_it = dxls.find(result_it->first);
+    if(dxls_it != dxls.end())
+      online_walking->curr_angle_rad_[joint_name_to_index_[result_it->first]] = dxls_it->second->dxl_state_->present_position_;
+  }
 
   process_mutex_.lock();
   online_walking->process();
 
-  desired_matrix_g_to_pelvis_   = online_walking->mat_g_to_pelvis_;
-  desired_matrix_g_to_rfoot_ = online_walking->mat_g_to_rfoot_;
-  desired_matrix_g_to_lfoot_ = online_walking->mat_g_to_lfoot_;
+  desired_matrix_g_to_pelvis_ = online_walking->mat_g_to_pelvis_;
+  desired_matrix_g_to_rfoot_  = online_walking->mat_g_to_rfoot_;
+  desired_matrix_g_to_lfoot_  = online_walking->mat_g_to_lfoot_;
   process_mutex_.unlock();
 
   //publishRobotPose();
@@ -722,9 +959,9 @@ void OnlineWalkingModule::process(std::map<std::string, robotis_framework::Dynam
   result_["r_hip_pitch"  ]->goal_position_ = online_walking->out_angle_rad_[0];
   result_["r_hip_roll"   ]->goal_position_ = online_walking->out_angle_rad_[1];
   result_["r_hip_yaw"    ]->goal_position_ = online_walking->out_angle_rad_[2];
-  result_["r_knee_pitch" ]->goal_position_  = online_walking->out_angle_rad_[3];
-  result_["r_ankle_pitch"]->goal_position_  = online_walking->out_angle_rad_[4];
-  result_["r_ankle_roll" ]->goal_position_  = online_walking->out_angle_rad_[5];
+  result_["r_knee_pitch" ]->goal_position_ = online_walking->out_angle_rad_[3];
+  result_["r_ankle_pitch"]->goal_position_ = online_walking->out_angle_rad_[4];
+  result_["r_ankle_roll" ]->goal_position_ = online_walking->out_angle_rad_[5];
 
   result_["l_hip_pitch"  ]->goal_position_ = online_walking->out_angle_rad_[6];
   result_["l_hip_roll"   ]->goal_position_ = online_walking->out_angle_rad_[7];

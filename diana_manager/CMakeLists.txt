@@ -37,15 +37,17 @@ find_package(Eigen3 REQUIRED)
 ################################################################################
 # Catkin specific configuration
 ################################################################################
-catkin_package()
+catkin_package(
+  LIBRARIES diana_soccer_manager
+)
 
 ################################################################################
 # Build
 ################################################################################
 include_directories(
   include
-  ${Eigen_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 add_executable(diana_soccer_manager src/diana_soccer_manager.cpp)

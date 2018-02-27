@@ -98,7 +98,6 @@ void DIANAOnlineWalking::process()
   out_angle_rad_[6] = l_leg_out_angle_rad_[2];
   out_angle_rad_[7] = l_leg_out_angle_rad_[1];
   out_angle_rad_[8] = l_leg_out_angle_rad_[0];
-
 }
 
 bool DIANAOnlineWalking::isRunning()

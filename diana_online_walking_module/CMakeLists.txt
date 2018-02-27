@@ -11,8 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   sensor_msgs
+  geometry_msgs
   cmake_modules
-  eigen_conversions
   robotis_math
   robotis_framework_common
   robotis_controller_msgs
@@ -23,7 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
   diana_online_walking_module_msgs
 )
 
-find_package(Eigen3 REQUIRED)
+find_package(Eigen REQUIRED)
 
 ################################################################################
 # Declare ROS messages, services and actions
@@ -47,8 +47,8 @@ catkin_package(
 ################################################################################
 include_directories(
   include
-  ${Eigen_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 add_library(diana_online_walking_module

@@ -44,6 +44,7 @@ public:
   double r_leg_out_angle_rad_[6];
   double l_leg_out_angle_rad_[6];
   double out_angle_rad_[12];
+  double curr_angle_rad_[12];
 
   heroehs::PDController leg_angle_feed_back_[12];
 
