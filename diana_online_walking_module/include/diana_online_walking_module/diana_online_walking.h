@@ -59,7 +59,7 @@ public:
   //imu
   Eigen::Quaterniond quat_current_imu_;
   Eigen::Matrix3d mat_current_imu_;
-  Eigen::Matrix3d mat_imu_frame_ref_;
+  Eigen::Matrix3d mat_imu_frame_ref_, mat_imu_frame_ref_inv_;
   double current_imu_roll_rad_, current_imu_pitch_rad_;
   double current_gyro_roll_rad_per_sec_, current_gyro_pitch_rad_per_sec_;
 

@@ -19,6 +19,9 @@ DIANAOnlineWalking::DIANAOnlineWalking()
   mat_lhip_to_pelvis_ = robotis_framework::getTransformationXYZRPY(0, -0.105, 0, 0, 0, 0);
 
   balance_error_ = heroehs::BalanceControlError::NoError;
+
+  mat_imu_frame_ref_ = robotis_framework::getRotationX(M_PI) * robotis_framework::getRotationZ(-0.5*M_PI);
+  mat_imu_frame_ref_inv_ = mat_imu_frame_ref_.transpose();
 }
 
 DIANAOnlineWalking::~DIANAOnlineWalking()
@@ -115,10 +118,10 @@ void DIANAOnlineWalking::setCurrentIMUSensorOutput(double gyro_x, double gyro_y,
 
   quat_current_imu_ = Eigen::Quaterniond(quat_w, quat_x, quat_y, quat_z);
 
-//  mat_current_imu_ = (rot_x_pi_3d_ * quat_current_imu_.toRotationMatrix()) * rot_z_pi_3d_;
-//
-//  current_imu_roll_rad_  = atan2( mat_current_imu_.coeff(2,1), mat_current_imu_.coeff(2,2));
-//  current_imu_pitch_rad_ = atan2(-mat_current_imu_.coeff(2,0), sqrt(robotis_framework::powDI(mat_current_imu_.coeff(2,1), 2) + robotis_framework::powDI(mat_current_imu_.coeff(2,2), 2)));
+  mat_current_imu_ = (mat_imu_frame_ref_ * quat_current_imu_.toRotationMatrix()) * mat_imu_frame_ref_inv_;
+
+  current_imu_roll_rad_  = atan2( mat_current_imu_.coeff(2,1), mat_current_imu_.coeff(2,2));
+  current_imu_pitch_rad_ = atan2(-mat_current_imu_.coeff(2,0), sqrt(robotis_framework::powDI(mat_current_imu_.coeff(2,1), 2) + robotis_framework::powDI(mat_current_imu_.coeff(2,2), 2)));
 
   imu_data_mutex_lock_.unlock();
 }
