@@ -262,7 +262,7 @@ void DIANAOnlineWalking::process()
   out_angle_rad_[7] = l_leg_out_angle_rad_[1];
   out_angle_rad_[8] = l_leg_out_angle_rad_[0];
 
-  std::cout << out_angle_rad_[2] << "  " << curr_angle_rad_[2] << std::endl;
+  //std::cout << out_angle_rad_[0] << "  " << curr_angle_rad_[0] << std::endl;
 
   for(int angle_idx = 0; angle_idx < 6; angle_idx++)
   {

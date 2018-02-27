@@ -24,62 +24,62 @@ waist_roll:
   return_delay_time: 10
 l_hip_pitch:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 r_hip_pitch:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 l_hip_roll:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 r_hip_roll:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 l_hip_yaw:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 r_hip_yaw:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 l_knee_pitch:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 r_knee_pitch:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 l_ankle_pitch:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 r_ankle_pitch:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 l_ankle_roll:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 r_ankle_roll:
   position_p_gain: 2400
-  position_i_gain: 240
+  position_i_gain: 80
   position_d_gain: 360
   return_delay_time: 10
 head_yaw:
