@@ -172,7 +172,7 @@ void OnlineWalkingModule::queueThread()
   ros::ServiceServer walking_start_server      = ros_node.advertiseService("/heroehs/online_walking/walking_start",             &OnlineWalkingModule::startWalkingServiceCallback,           this);
   ros::ServiceServer is_running_server         = ros_node.advertiseService("/heroehs/online_walking/is_running",                &OnlineWalkingModule::IsRunningServiceCallback,              this);
   ros::ServiceServer set_balance_param_server  = ros_node.advertiseService("/heroehs/online_walking/set_balance_param",         &OnlineWalkingModule::setBalanceParamServiceCallback,        this);
-  //ros::ServiceServer set_joint_feedback_gain   = ros_node.advertiseService("/heroehs/online_walking/joint_feedback_gain",       &OnlineWalkingModule::setJointFeedBackGainServiceCallback,   this);
+  ros::ServiceServer set_joint_feedback_gain   = ros_node.advertiseService("/heroehs/online_walking/joint_feedback_gain",       &OnlineWalkingModule::setJointFeedBackGainServiceCallback,   this);
   ros::ServiceServer remove_existing_step_data = ros_node.advertiseService("/heroehs/online_walking/remove_existing_step_data", &OnlineWalkingModule::removeExistingStepDataServiceCallback, this);
 
   /* sensor topic subscribe */
@@ -520,6 +520,143 @@ bool OnlineWalkingModule::removeExistingStepDataServiceCallback(diana_online_wal
   return true;
 }
 
+bool OnlineWalkingModule::setJointFeedBackGainServiceCallback(diana_online_walking_module_msgs::SetJointFeedBackGain::Request &req,
+    diana_online_walking_module_msgs::SetJointFeedBackGain::Response &res)
+{
+  DIANAOnlineWalking *online_walking = DIANAOnlineWalking::getInstance();
+
+  res.result = diana_online_walking_module_msgs::SetJointFeedBackGain::Response::NO_ERROR;
+
+  if( enable_ == false)
+    res.result |= diana_online_walking_module_msgs::SetJointFeedBackGain::Response::NOT_ENABLED_WALKING_MODULE;
+
+  if( joint_feedback_update_with_loop_ == true)
+    res.result |= diana_online_walking_module_msgs::SetJointFeedBackGain::Response::PREV_REQUEST_IS_NOT_FINISHED;
+
+  if( res.result != diana_online_walking_module_msgs::SetJointFeedBackGain::Response::NO_ERROR)
+  {
+    publishDoneMsg("walking_joint_feedback_failed");
+    return true;
+  }
+
+  if( req.updating_duration <= 0.0 )
+  {
+    // under 8ms apply immediately
+    setJointFeedBackGain(req.feedback_gain);
+    std::string status_msg = WalkingStatusMSG::JOINT_FEEDBACK_GAIN_UPDATE_FINISHED_MSG;
+    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_INFO, status_msg);
+    publishDoneMsg("walking_joint_feedback");
+    return true;
+  }
+  else
+  {
+    joint_feedback_update_duration_ = req.updating_duration;
+  }
+
+  joint_feedback_update_sys_time_ = 0.0;
+  double tf = joint_feedback_update_duration_;
+  joint_feedback_update_tra_.changeTrajectory(0, 0, 0, 0, joint_feedback_update_duration_, 1.0, 0, 0);
+
+  desired_joint_feedback_gain_ = req.feedback_gain;
+
+  previous_joint_feedback_gain_.r_leg_hip_y_p_gain = online_walking->leg_angle_feed_back_[0].p_gain_;
+  previous_joint_feedback_gain_.r_leg_hip_y_d_gain = online_walking->leg_angle_feed_back_[0].d_gain_;
+  previous_joint_feedback_gain_.r_leg_hip_r_p_gain = online_walking->leg_angle_feed_back_[1].p_gain_;
+  previous_joint_feedback_gain_.r_leg_hip_r_d_gain = online_walking->leg_angle_feed_back_[1].d_gain_;
+  previous_joint_feedback_gain_.r_leg_hip_p_p_gain = online_walking->leg_angle_feed_back_[2].p_gain_;
+  previous_joint_feedback_gain_.r_leg_hip_p_d_gain = online_walking->leg_angle_feed_back_[2].d_gain_;
+  previous_joint_feedback_gain_.r_leg_kn_p_p_gain  = online_walking->leg_angle_feed_back_[3].p_gain_;
+  previous_joint_feedback_gain_.r_leg_kn_p_d_gain  = online_walking->leg_angle_feed_back_[3].d_gain_;
+  previous_joint_feedback_gain_.r_leg_an_p_p_gain  = online_walking->leg_angle_feed_back_[4].p_gain_;
+  previous_joint_feedback_gain_.r_leg_an_p_d_gain  = online_walking->leg_angle_feed_back_[4].d_gain_;
+  previous_joint_feedback_gain_.r_leg_an_r_p_gain  = online_walking->leg_angle_feed_back_[5].p_gain_;
+  previous_joint_feedback_gain_.r_leg_an_r_d_gain  = online_walking->leg_angle_feed_back_[5].d_gain_;
+
+  previous_joint_feedback_gain_.l_leg_hip_y_p_gain = online_walking->leg_angle_feed_back_[6].p_gain_;
+  previous_joint_feedback_gain_.l_leg_hip_y_d_gain = online_walking->leg_angle_feed_back_[6].d_gain_;
+  previous_joint_feedback_gain_.l_leg_hip_r_p_gain = online_walking->leg_angle_feed_back_[7].p_gain_;
+  previous_joint_feedback_gain_.l_leg_hip_r_d_gain = online_walking->leg_angle_feed_back_[7].d_gain_;
+  previous_joint_feedback_gain_.l_leg_hip_p_p_gain = online_walking->leg_angle_feed_back_[8].p_gain_;
+  previous_joint_feedback_gain_.l_leg_hip_p_d_gain = online_walking->leg_angle_feed_back_[8].d_gain_;
+  previous_joint_feedback_gain_.l_leg_kn_p_p_gain  = online_walking->leg_angle_feed_back_[9].p_gain_;
+  previous_joint_feedback_gain_.l_leg_kn_p_d_gain  = online_walking->leg_angle_feed_back_[9].d_gain_;
+  previous_joint_feedback_gain_.l_leg_an_p_p_gain  = online_walking->leg_angle_feed_back_[10].p_gain_;
+  previous_joint_feedback_gain_.l_leg_an_p_d_gain  = online_walking->leg_angle_feed_back_[10].d_gain_;
+  previous_joint_feedback_gain_.l_leg_an_r_p_gain  = online_walking->leg_angle_feed_back_[11].p_gain_;
+  previous_joint_feedback_gain_.l_leg_an_r_d_gain  = online_walking->leg_angle_feed_back_[11].d_gain_;
+
+  joint_feedback_update_with_loop_ = true;
+  joint_feedback_update_sys_time_  = 0.0;
+
+  return true;
+}
+
+void OnlineWalkingModule::setJointFeedBackGain(diana_online_walking_module_msgs::JointFeedBackGain& msg)
+{
+  DIANAOnlineWalking *online_walking = DIANAOnlineWalking::getInstance();
+  online_walking->leg_angle_feed_back_[0].p_gain_  = msg.r_leg_hip_y_p_gain ;
+  online_walking->leg_angle_feed_back_[0].d_gain_  = msg.r_leg_hip_y_d_gain ;
+  online_walking->leg_angle_feed_back_[1].p_gain_  = msg.r_leg_hip_r_p_gain ;
+  online_walking->leg_angle_feed_back_[1].d_gain_  = msg.r_leg_hip_r_d_gain ;
+  online_walking->leg_angle_feed_back_[2].p_gain_  = msg.r_leg_hip_p_p_gain ;
+  online_walking->leg_angle_feed_back_[2].d_gain_  = msg.r_leg_hip_p_d_gain ;
+  online_walking->leg_angle_feed_back_[3].p_gain_  = msg.r_leg_kn_p_p_gain  ;
+  online_walking->leg_angle_feed_back_[3].d_gain_  = msg.r_leg_kn_p_d_gain  ;
+  online_walking->leg_angle_feed_back_[4].p_gain_  = msg.r_leg_an_p_p_gain  ;
+  online_walking->leg_angle_feed_back_[4].d_gain_  = msg.r_leg_an_p_d_gain  ;
+  online_walking->leg_angle_feed_back_[5].p_gain_  = msg.r_leg_an_r_p_gain  ;
+  online_walking->leg_angle_feed_back_[5].d_gain_  = msg.r_leg_an_r_d_gain  ;
+
+  online_walking->leg_angle_feed_back_[6].p_gain_  = msg.l_leg_hip_y_p_gain ;
+  online_walking->leg_angle_feed_back_[6].d_gain_  = msg.l_leg_hip_y_d_gain ;
+  online_walking->leg_angle_feed_back_[7].p_gain_  = msg.l_leg_hip_r_p_gain ;
+  online_walking->leg_angle_feed_back_[7].d_gain_  = msg.l_leg_hip_r_d_gain ;
+  online_walking->leg_angle_feed_back_[8].p_gain_  = msg.l_leg_hip_p_p_gain ;
+  online_walking->leg_angle_feed_back_[8].d_gain_  = msg.l_leg_hip_p_d_gain ;
+  online_walking->leg_angle_feed_back_[9].p_gain_  = msg.l_leg_kn_p_p_gain  ;
+  online_walking->leg_angle_feed_back_[9].d_gain_  = msg.l_leg_kn_p_d_gain  ;
+  online_walking->leg_angle_feed_back_[10].p_gain_ = msg.l_leg_an_p_p_gain  ;
+  online_walking->leg_angle_feed_back_[10].d_gain_ = msg.l_leg_an_p_d_gain  ;
+  online_walking->leg_angle_feed_back_[11].p_gain_ = msg.l_leg_an_r_p_gain  ;
+  online_walking->leg_angle_feed_back_[11].d_gain_ = msg.l_leg_an_r_d_gain  ;
+}
+
+
+void OnlineWalkingModule::updateJointFeedBackGain()
+{
+  double current_update_gain =  joint_feedback_update_tra_.getPosition(joint_feedback_update_sys_time_);
+
+
+  current_joint_feedback_gain_.r_leg_hip_y_p_gain = current_update_gain*(desired_joint_feedback_gain_.r_leg_hip_y_p_gain - previous_joint_feedback_gain_.r_leg_hip_y_p_gain ) + previous_joint_feedback_gain_.r_leg_hip_y_p_gain  ;
+  current_joint_feedback_gain_.r_leg_hip_y_d_gain = current_update_gain*(desired_joint_feedback_gain_.r_leg_hip_y_d_gain - previous_joint_feedback_gain_.r_leg_hip_y_d_gain ) + previous_joint_feedback_gain_.r_leg_hip_y_d_gain  ;
+  current_joint_feedback_gain_.r_leg_hip_r_p_gain = current_update_gain*(desired_joint_feedback_gain_.r_leg_hip_r_p_gain - previous_joint_feedback_gain_.r_leg_hip_r_p_gain ) + previous_joint_feedback_gain_.r_leg_hip_r_p_gain  ;
+  current_joint_feedback_gain_.r_leg_hip_r_d_gain = current_update_gain*(desired_joint_feedback_gain_.r_leg_hip_r_d_gain - previous_joint_feedback_gain_.r_leg_hip_r_d_gain ) + previous_joint_feedback_gain_.r_leg_hip_r_d_gain  ;
+  current_joint_feedback_gain_.r_leg_hip_p_p_gain = current_update_gain*(desired_joint_feedback_gain_.r_leg_hip_p_p_gain - previous_joint_feedback_gain_.r_leg_hip_p_p_gain ) + previous_joint_feedback_gain_.r_leg_hip_p_p_gain  ;
+  current_joint_feedback_gain_.r_leg_hip_p_d_gain = current_update_gain*(desired_joint_feedback_gain_.r_leg_hip_p_d_gain - previous_joint_feedback_gain_.r_leg_hip_p_d_gain ) + previous_joint_feedback_gain_.r_leg_hip_p_d_gain  ;
+  current_joint_feedback_gain_.r_leg_kn_p_p_gain  = current_update_gain*(desired_joint_feedback_gain_.r_leg_kn_p_p_gain  - previous_joint_feedback_gain_.r_leg_kn_p_p_gain  ) + previous_joint_feedback_gain_.r_leg_kn_p_p_gain   ;
+  current_joint_feedback_gain_.r_leg_kn_p_d_gain  = current_update_gain*(desired_joint_feedback_gain_.r_leg_kn_p_d_gain  - previous_joint_feedback_gain_.r_leg_kn_p_d_gain  ) + previous_joint_feedback_gain_.r_leg_kn_p_d_gain   ;
+  current_joint_feedback_gain_.r_leg_an_p_p_gain  = current_update_gain*(desired_joint_feedback_gain_.r_leg_an_p_p_gain  - previous_joint_feedback_gain_.r_leg_an_p_p_gain  ) + previous_joint_feedback_gain_.r_leg_an_p_p_gain   ;
+  current_joint_feedback_gain_.r_leg_an_p_d_gain  = current_update_gain*(desired_joint_feedback_gain_.r_leg_an_p_d_gain  - previous_joint_feedback_gain_.r_leg_an_p_d_gain  ) + previous_joint_feedback_gain_.r_leg_an_p_d_gain   ;
+  current_joint_feedback_gain_.r_leg_an_r_p_gain  = current_update_gain*(desired_joint_feedback_gain_.r_leg_an_r_p_gain  - previous_joint_feedback_gain_.r_leg_an_r_p_gain  ) + previous_joint_feedback_gain_.r_leg_an_r_p_gain   ;
+  current_joint_feedback_gain_.r_leg_an_r_d_gain  = current_update_gain*(desired_joint_feedback_gain_.r_leg_an_r_d_gain  - previous_joint_feedback_gain_.r_leg_an_r_d_gain  ) + previous_joint_feedback_gain_.r_leg_an_r_d_gain   ;
+
+  current_joint_feedback_gain_.l_leg_hip_y_p_gain = current_update_gain*(desired_joint_feedback_gain_.l_leg_hip_y_p_gain - previous_joint_feedback_gain_.l_leg_hip_y_p_gain ) + previous_joint_feedback_gain_.l_leg_hip_y_p_gain  ;
+  current_joint_feedback_gain_.l_leg_hip_y_d_gain = current_update_gain*(desired_joint_feedback_gain_.l_leg_hip_y_d_gain - previous_joint_feedback_gain_.l_leg_hip_y_d_gain ) + previous_joint_feedback_gain_.l_leg_hip_y_d_gain  ;
+  current_joint_feedback_gain_.l_leg_hip_r_p_gain = current_update_gain*(desired_joint_feedback_gain_.l_leg_hip_r_p_gain - previous_joint_feedback_gain_.l_leg_hip_r_p_gain ) + previous_joint_feedback_gain_.l_leg_hip_r_p_gain  ;
+  current_joint_feedback_gain_.l_leg_hip_r_d_gain = current_update_gain*(desired_joint_feedback_gain_.l_leg_hip_r_d_gain - previous_joint_feedback_gain_.l_leg_hip_r_d_gain ) + previous_joint_feedback_gain_.l_leg_hip_r_d_gain  ;
+  current_joint_feedback_gain_.l_leg_hip_p_p_gain = current_update_gain*(desired_joint_feedback_gain_.l_leg_hip_p_p_gain - previous_joint_feedback_gain_.l_leg_hip_p_p_gain ) + previous_joint_feedback_gain_.l_leg_hip_p_p_gain  ;
+  current_joint_feedback_gain_.l_leg_hip_p_d_gain = current_update_gain*(desired_joint_feedback_gain_.l_leg_hip_p_d_gain - previous_joint_feedback_gain_.l_leg_hip_p_d_gain ) + previous_joint_feedback_gain_.l_leg_hip_p_d_gain  ;
+  current_joint_feedback_gain_.l_leg_kn_p_p_gain  = current_update_gain*(desired_joint_feedback_gain_.l_leg_kn_p_p_gain  - previous_joint_feedback_gain_.l_leg_kn_p_p_gain  ) + previous_joint_feedback_gain_.l_leg_kn_p_p_gain   ;
+  current_joint_feedback_gain_.l_leg_kn_p_d_gain  = current_update_gain*(desired_joint_feedback_gain_.l_leg_kn_p_d_gain  - previous_joint_feedback_gain_.l_leg_kn_p_d_gain  ) + previous_joint_feedback_gain_.l_leg_kn_p_d_gain   ;
+  current_joint_feedback_gain_.l_leg_an_p_p_gain  = current_update_gain*(desired_joint_feedback_gain_.l_leg_an_p_p_gain  - previous_joint_feedback_gain_.l_leg_an_p_p_gain  ) + previous_joint_feedback_gain_.l_leg_an_p_p_gain   ;
+  current_joint_feedback_gain_.l_leg_an_p_d_gain  = current_update_gain*(desired_joint_feedback_gain_.l_leg_an_p_d_gain  - previous_joint_feedback_gain_.l_leg_an_p_d_gain  ) + previous_joint_feedback_gain_.l_leg_an_p_d_gain   ;
+  current_joint_feedback_gain_.l_leg_an_r_p_gain  = current_update_gain*(desired_joint_feedback_gain_.l_leg_an_r_p_gain  - previous_joint_feedback_gain_.l_leg_an_r_p_gain  ) + previous_joint_feedback_gain_.l_leg_an_r_p_gain   ;
+  current_joint_feedback_gain_.l_leg_an_r_d_gain  = current_update_gain*(desired_joint_feedback_gain_.l_leg_an_r_d_gain  - previous_joint_feedback_gain_.l_leg_an_r_d_gain  ) + previous_joint_feedback_gain_.l_leg_an_r_d_gain   ;
+
+
+  setJointFeedBackGain(current_joint_feedback_gain_);
+}
+
 bool OnlineWalkingModule::setBalanceParamServiceCallback(diana_online_walking_module_msgs::SetBalanceParam::Request  &req,
     diana_online_walking_module_msgs::SetBalanceParam::Response &res)
 {
@@ -788,6 +925,16 @@ void OnlineWalkingModule::imuDataOutputCallback(const sensor_msgs::Imu::ConstPtr
                                             msg->orientation.w);
 }
 
+void OnlineWalkingModule::ftDataOutputCallback(const diana_msgs::ForceTorque::ConstPtr &msg)
+{
+  DIANAOnlineWalking *online_walking = DIANAOnlineWalking::getInstance();
+
+  online_walking->setCurrentFTSensorOutput(msg->force_x_raw_r, msg->force_y_raw_r, msg->force_z_raw_r,
+      msg->torque_x_raw_r, msg->torque_y_raw_r, msg->torque_z_raw_r,
+      msg->force_x_raw_l, msg->force_y_raw_l, msg->force_z_raw_l,
+      msg->torque_x_raw_l, msg->torque_y_raw_l, msg->torque_z_raw_l);
+}
+
 
 void OnlineWalkingModule::onModuleEnable()
 {
@@ -917,22 +1064,22 @@ void OnlineWalkingModule::process(std::map<std::string, robotis_framework::Dynam
     }
   }
 
-//  if(joint_feedback_update_with_loop_ == true)
-//  {
-//    joint_feedback_update_sys_time_ += control_cycle_msec_ * 0.001;
-//    if(joint_feedback_update_sys_time_ >= joint_feedback_update_duration_ )
-//    {
-//      joint_feedback_update_sys_time_ = joint_feedback_update_duration_;
-//      joint_feedback_update_with_loop_ = false;
-//      setJointFeedBackGain(desired_joint_feedback_gain_);
-//      publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_INFO, WalkingStatusMSG::JOINT_FEEDBACK_GAIN_UPDATE_FINISHED_MSG);
-//      publishDoneMsg("walking_joint_feedback");
-//    }
-//    else
-//    {
-//      updateJointFeedBackGain();
-//    }
-//  }
+  if(joint_feedback_update_with_loop_ == true)
+  {
+    joint_feedback_update_sys_time_ += control_cycle_msec_ * 0.001;
+    if(joint_feedback_update_sys_time_ >= joint_feedback_update_duration_ )
+    {
+      joint_feedback_update_sys_time_ = joint_feedback_update_duration_;
+      joint_feedback_update_with_loop_ = false;
+      setJointFeedBackGain(desired_joint_feedback_gain_);
+      publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_INFO, WalkingStatusMSG::JOINT_FEEDBACK_GAIN_UPDATE_FINISHED_MSG);
+      publishDoneMsg("walking_joint_feedback");
+    }
+    else
+    {
+      updateJointFeedBackGain();
+    }
+  }
 
 //  online_walking->current_right_fx_N_  = r_foot_fx_N_;
 //  online_walking->current_right_fy_N_  = r_foot_fy_N_;

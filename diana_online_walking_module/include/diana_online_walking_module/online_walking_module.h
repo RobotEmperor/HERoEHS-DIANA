@@ -32,6 +32,8 @@
 
 #include "diana_online_walking_module_msgs/WalkingJointStatesStamped.h"
 
+#include "diana_msgs/ForceTorque.h"
+
 namespace diana
 {
 class OnlineWalkingModule : public robotis_framework::MotionModule, public robotis_framework::Singleton<OnlineWalkingModule>
@@ -57,6 +59,7 @@ private:
 
   /* ROS Topic Callback Functions */
   void imuDataOutputCallback(const sensor_msgs::Imu::ConstPtr &msg);
+  void ftDataOutputCallback(const diana_msgs::ForceTorque::ConstPtr &msg);
 
   /* ROS Service Callback Functions */
   bool setBalanceParamServiceCallback(diana_online_walking_module_msgs::SetBalanceParam::Request  &req,

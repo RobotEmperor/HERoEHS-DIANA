@@ -21,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
   heroehs_pd_balance_controller
   diana_kinematics_dynamics
   diana_online_walking_module_msgs
+  diana_msgs
 )
 
 find_package(Eigen REQUIRED)
