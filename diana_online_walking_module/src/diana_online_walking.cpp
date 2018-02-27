@@ -23,10 +23,10 @@ DIANAOnlineWalking::DIANAOnlineWalking()
   mat_imu_frame_ref_ = robotis_framework::getRotationX(M_PI) * robotis_framework::getRotationZ(-0.5*M_PI);
   mat_imu_frame_ref_inv_ = mat_imu_frame_ref_.transpose();
 
-  right_dsp_fz_N_ = 0.5*25.0 * 9.8;
-  left_dsp_fz_N_  = 0.5*25.0 * 9.8;
-  right_ssp_fz_N_ = 25.0 * 9.8;
-  left_ssp_fz_N_  = 25.0 * 9.8;
+  right_dsp_fz_N_ = -0.5*25.0 * 9.8;
+  left_dsp_fz_N_  = -0.5*25.0 * 9.8;
+  right_ssp_fz_N_ = -25.0 * 9.8;
+  left_ssp_fz_N_  = -25.0 * 9.8;
 }
 
 DIANAOnlineWalking::~DIANAOnlineWalking()
@@ -261,6 +261,8 @@ void DIANAOnlineWalking::process()
   out_angle_rad_[6] = l_leg_out_angle_rad_[2];
   out_angle_rad_[7] = l_leg_out_angle_rad_[1];
   out_angle_rad_[8] = l_leg_out_angle_rad_[0];
+
+  std::cout << out_angle_rad_[2] << "  " << curr_angle_rad_[2] << std::endl;
 
   for(int angle_idx = 0; angle_idx < 6; angle_idx++)
   {
