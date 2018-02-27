@@ -737,6 +737,8 @@ void OnlineWalkingModule::updateBalanceParam()
 
 bool OnlineWalkingModule::checkBalanceOnOff()
 {
+  return true;
+
   if(gazebo_)
     return true;
 
