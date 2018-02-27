@@ -176,7 +176,8 @@ void OnlineWalkingModule::queueThread()
   ros::ServiceServer remove_existing_step_data = ros_node.advertiseService("/heroehs/online_walking/remove_existing_step_data", &OnlineWalkingModule::removeExistingStepDataServiceCallback, this);
 
   /* sensor topic subscribe */
-  ros::Subscriber imu_data_sub      = ros_node.subscribe("/imu/data", 3, &OnlineWalkingModule::imuDataOutputCallback,        this);
+  ros::Subscriber imu_data_sub = ros_node.subscribe("/imu/data", 3, &OnlineWalkingModule::imuDataOutputCallback,        this);
+  ros::Subscriber ft_data_sub  = ros_node.subscribe("/diana/force_torque_data", 3, &OnlineWalkingModule::ftDataOutputCallback, this);
 
   ros::WallDuration duration(control_cycle_msec_ / 1000.0);
   if(ros::param::get("gazebo", gazebo_) == false)
