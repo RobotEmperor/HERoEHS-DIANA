@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <name>diana_manager</name>
+  <version>0.0.0</version>
+  <description>The diana_manager package</description>
+
+  <maintainer email="jaysong@todo.todo">jaysong</maintainer>
+
+  <license>TODO</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>dynamixel_sdk</build_depend>
+  <build_depend>robotis_framework_common</build_depend>
+  <build_depend>robotis_device</build_depend>
+  <build_depend>robotis_controller</build_depend>
+  <build_depend>robotis_controller_msgs</build_depend>
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>robotis_math</build_depend>
+  <build_depend>heroehs_math</build_depend>
+  <build_depend>heroehs_online_walking_pattern_generator</build_depend>
+  <build_depend>heroehs_pd_balance_controller</build_depend>
+  <build_depend>diana_kinematics_dynamics</build_depend>
+  <build_depend>diana_online_walking_module</build_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>robotis_controller</run_depend>
+  <run_depend>diana_online_walking_module</run_depend>
+</package>
