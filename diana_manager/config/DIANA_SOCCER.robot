@@ -3,7 +3,7 @@ control_cycle = 8   # milliseconds
 
 [ port info ]
 # PORT NAME  | BAUDRATE
-/dev/ttyUSB0| 1000000  | head_yaw  
+/dev/ttyUSB0| 3000000  | head_yaw  
 
 
 [ device info ]

@@ -23,10 +23,10 @@ DIANAOnlineWalking::DIANAOnlineWalking()
   mat_imu_frame_ref_ = robotis_framework::getRotationX(M_PI) * robotis_framework::getRotationZ(-0.5*M_PI);
   mat_imu_frame_ref_inv_ = mat_imu_frame_ref_.transpose();
 
-  right_dsp_fz_N_ = -0.5*25.0 * 9.8;
-  left_dsp_fz_N_  = -0.5*25.0 * 9.8;
-  right_ssp_fz_N_ = -25.0 * 9.8;
-  left_ssp_fz_N_  = -25.0 * 9.8;
+  right_dsp_fz_N_ = -0.5*30.0 * 9.8;
+  left_dsp_fz_N_  = -0.5*30.0 * 9.8;
+  right_ssp_fz_N_ = -30.0 * 9.8;
+  left_ssp_fz_N_  = -30.0 * 9.8;
 }
 
 DIANAOnlineWalking::~DIANAOnlineWalking()
@@ -39,17 +39,17 @@ void DIANAOnlineWalking::initialize(double control_cycle_sec)
   diana_kd_ = new DIANAKinematicsDynamics(WholeBody);
 
   robotis_framework::Pose3D r_foot, l_foot, pelvis;
-  r_foot.x = 0.0;    r_foot.y = -0.105;  r_foot.z = -0.55;
+  r_foot.x = 0.0;    r_foot.y = -0.12;  r_foot.z = -0.55;
   r_foot.roll = 0.0; r_foot.pitch = 0.0; r_foot.yaw = 0.0;
 
-  l_foot.x = 0.0;    l_foot.y = 0.105;   l_foot.z = -0.55;
+  l_foot.x = 0.0;    l_foot.y = 0.12;   l_foot.z = -0.55;
   l_foot.roll = 0.0; l_foot.pitch = 0.0; l_foot.yaw = 0.0;
 
   pelvis.x = 0.0;    pelvis.y = 0.0;     pelvis.z = 0.0;
   pelvis.roll = 0.0; pelvis.pitch = 0.0; pelvis.yaw = 0;
 
   walking_pattern_.setInitialPose(r_foot, l_foot, pelvis);
-  walking_pattern_.initialize(0.6, 1.6, control_cycle_sec);
+  walking_pattern_.initialize(0.7, 1.6, control_cycle_sec);
 
   // initialize balance
   balance_ctrl_.initialize(control_cycle_sec);
@@ -266,7 +266,6 @@ void DIANAOnlineWalking::process()
   }
   l_leg_out_angle_rad_[0] = -l_leg_out_angle_rad_[0];
   l_leg_out_angle_rad_[4] = -l_leg_out_angle_rad_[4];
-
 
   for(int i = 0; i < 6; i++)
   {
