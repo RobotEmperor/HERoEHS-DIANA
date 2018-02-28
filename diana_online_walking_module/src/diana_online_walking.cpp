@@ -49,7 +49,7 @@ void DIANAOnlineWalking::initialize(double control_cycle_sec)
   pelvis.roll = 0.0; pelvis.pitch = 0.0; pelvis.yaw = 0;
 
   walking_pattern_.setInitialPose(r_foot, l_foot, pelvis);
-  walking_pattern_.initialize(0.5, 1.6, control_cycle_sec);
+  walking_pattern_.initialize(0.6, 1.6, control_cycle_sec);
 
   // initialize balance
   balance_ctrl_.initialize(control_cycle_sec);
@@ -242,25 +242,45 @@ void DIANAOnlineWalking::process()
   lhip_to_lfoot_pose_ = robotis_framework::getPose3DfromTransformMatrix((mat_lhip_to_pelvis_ * mat_pelvis_to_robot_modified_) * mat_robot_to_lf_modified_);
 
 
-  diana_kd_->calcInverseKinematicsForRightLeg(r_leg_out_angle_rad_, rhip_to_rfoot_pose_.x, rhip_to_rfoot_pose_.y, rhip_to_rfoot_pose_.z,
-      rhip_to_rfoot_pose_.roll, rhip_to_rfoot_pose_.pitch, rhip_to_rfoot_pose_.yaw);
-  diana_kd_->calcInverseKinematicsForLeftLeg(l_leg_out_angle_rad_, lhip_to_lfoot_pose_.x, lhip_to_lfoot_pose_.y, lhip_to_lfoot_pose_.z,
-      lhip_to_lfoot_pose_.roll, lhip_to_lfoot_pose_.pitch, lhip_to_lfoot_pose_.yaw);
+//  diana_kd_->calcInverseKinematicsForRightLeg(r_leg_out_angle_rad_, rhip_to_rfoot_pose_.x, rhip_to_rfoot_pose_.y, rhip_to_rfoot_pose_.z,
+//      rhip_to_rfoot_pose_.roll, rhip_to_rfoot_pose_.pitch, rhip_to_rfoot_pose_.yaw);
+//  diana_kd_->calcInverseKinematicsForLeftLeg(l_leg_out_angle_rad_, lhip_to_lfoot_pose_.x, lhip_to_lfoot_pose_.y, lhip_to_lfoot_pose_.z,
+//      lhip_to_lfoot_pose_.roll, lhip_to_lfoot_pose_.pitch, lhip_to_lfoot_pose_.yaw);
+
+
+  diana_kin_.InverseKinematics(rhip_to_rfoot_pose_.x, rhip_to_rfoot_pose_.y, rhip_to_rfoot_pose_.z,
+      rhip_to_rfoot_pose_.yaw, rhip_to_rfoot_pose_.pitch, rhip_to_rfoot_pose_.roll);
+
+  for(int i = 0; i < 6; i++)
+  {
+	  r_leg_out_angle_rad_[i] =  diana_kin_.joint_radian(i+1,0);
+  }
+  r_leg_out_angle_rad_[3] = -r_leg_out_angle_rad_[3];
+
+  diana_kin_.InverseKinematics(lhip_to_lfoot_pose_.x, lhip_to_lfoot_pose_.y, lhip_to_lfoot_pose_.z,
+		  lhip_to_lfoot_pose_.yaw, lhip_to_lfoot_pose_.pitch, lhip_to_lfoot_pose_.roll);
+
+  for(int i = 0; i < 6; i++)
+  {
+	  l_leg_out_angle_rad_[i] =  diana_kin_.joint_radian(i+1,0);
+  }
+  l_leg_out_angle_rad_[0] = -l_leg_out_angle_rad_[0];
+  l_leg_out_angle_rad_[4] = -l_leg_out_angle_rad_[4];
 
 
   for(int i = 0; i < 6; i++)
   {
-    out_angle_rad_[i+0] = r_leg_out_angle_rad_[i];
-    out_angle_rad_[i+6] = l_leg_out_angle_rad_[i];
+	  out_angle_rad_[i+0] = r_leg_out_angle_rad_[i];
+	  out_angle_rad_[i+6] = l_leg_out_angle_rad_[i];
   }
 
-  out_angle_rad_[0] = r_leg_out_angle_rad_[2];
-  out_angle_rad_[1] = r_leg_out_angle_rad_[1];
-  out_angle_rad_[2] = r_leg_out_angle_rad_[0];
-
-  out_angle_rad_[6] = l_leg_out_angle_rad_[2];
-  out_angle_rad_[7] = l_leg_out_angle_rad_[1];
-  out_angle_rad_[8] = l_leg_out_angle_rad_[0];
+//  out_angle_rad_[0] = r_leg_out_angle_rad_[2];
+//  out_angle_rad_[1] = r_leg_out_angle_rad_[1];
+//  out_angle_rad_[2] = r_leg_out_angle_rad_[0];
+//
+//  out_angle_rad_[6] = l_leg_out_angle_rad_[2];
+//  out_angle_rad_[7] = l_leg_out_angle_rad_[1];
+//  out_angle_rad_[8] = l_leg_out_angle_rad_[0];
 
   //std::cout << out_angle_rad_[0] << "  " << curr_angle_rad_[0] << std::endl;
 

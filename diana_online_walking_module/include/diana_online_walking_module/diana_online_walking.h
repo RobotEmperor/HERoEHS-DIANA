@@ -13,6 +13,7 @@
 #include "heroehs_online_walking_pattern_generator/online_walking_pattern_generator.h"
 #include "heroehs_pd_balance_controller/heroehs_pd_balance_controller.h"
 #include "robotis_framework_common/singleton.h"
+#include "heroehs_math/kinematics.h"
 
 namespace diana
 {
@@ -80,6 +81,7 @@ public:
 private:
   heroehs::OnlineWalkingPatternGenerator walking_pattern_;
   DIANAKinematicsDynamics* diana_kd_;
+  heroehs_math::Kinematics diana_kin_;
 
   double right_dsp_fz_N_, left_dsp_fz_N_;
   double right_ssp_fz_N_, left_ssp_fz_N_;
